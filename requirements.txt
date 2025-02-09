@@ -1,0 +1,13 @@
+openai
+fastapi
+uvicorn
+python-multipart
+numpy
+websockets==10.4
+scipy
+google-generativeai
+pytest
+pytest-asyncio
+pytest-mock
+httpx
+python-dotenv
