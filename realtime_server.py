@@ -59,11 +59,12 @@ if not OPENAI_API_KEY:
 # Initialize with a default model
 llm_processor = get_llm_processor("gpt-4o")  # Default processor
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Use an absolute path for the static directory
+app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def get_realtime_page(request: Request):
-    return FileResponse("static/realtime.html")
+    return FileResponse(os.path.join(os.path.dirname(__file__), "static/realtime.html"))
 
 class AudioProcessor:
     def __init__(self, target_sample_rate=24000):
