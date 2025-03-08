@@ -17,6 +17,7 @@ const copyEnhancedButton = document.getElementById('copyEnhancedButton');
 const readabilityButton = document.getElementById('readabilityButton');
 const askAIButton = document.getElementById('askAIButton');
 const correctnessButton = document.getElementById('correctnessButton');
+const toComputerButton = document.getElementById('toComputerButton');
 
 // Configuration
 const targetSeconds = 5;
@@ -176,6 +177,11 @@ async function startRecording() {
         transcript.value = '';
         enhancedTranscript.value = '';
 
+        // Check if mediaDevices is available
+        if (!navigator.mediaDevices) {
+            throw new Error('Media devices not available. This may be because you are using HTTP instead of HTTPS. On mobile devices, microphone access requires a secure connection.');
+        }
+
         if (!streamInitialized) {
             stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
@@ -238,12 +244,6 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-    initializeWebSocket();
-    initializeTheme();
-    if (autoStart) initializeAudioStream();
-});
 // Readability and AI handlers
 readabilityButton.onclick = async () => {
     startTimer();
@@ -381,3 +381,58 @@ function initializeTheme() {
 
 // Add to your existing event listeners
 document.getElementById('themeToggle').onclick = toggleTheme;
+
+// 添加发送文本到电脑剪贴板的函数
+async function sendToComputerClipboard(text) {
+    if (!text) return;
+    try {
+        const response = await fetch('/api/v1/to_clipboard', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text }),
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showCopiedFeedback(toComputerButton, 'Sent to PC!');
+        } else {
+            showCopiedFeedback(toComputerButton, 'Failed!');
+            console.error('Failed to send to computer clipboard:', result.message);
+        }
+    } catch (err) {
+        showCopiedFeedback(toComputerButton, 'Error!');
+        console.error('Error sending to computer clipboard:', err);
+    }
+}
+
+// 在初始化函数中添加事件监听器
+function initializeEventListeners() {
+    // 现有的事件监听器...
+    
+    // 添加发送到电脑剪贴板按钮的事件监听器
+    if (toComputerButton) {
+        toComputerButton.addEventListener('click', () => {
+            sendToComputerClipboard(transcript.value);
+        });
+    }
+}
+
+// 在页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', () => {
+    initializeWebSocket();
+    initializeTheme();
+    initializeEventListeners();
+    
+    // 自动启动功能
+    if (autoStart && !isAutoStarted) {
+        setTimeout(() => {
+            if (recordButton && !isRecording) {
+                recordButton.click();
+                isAutoStarted = true;
+            }
+        }, 1000);
+    }
+});

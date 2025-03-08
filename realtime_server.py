@@ -19,6 +19,8 @@ from pydantic import BaseModel, Field
 from typing import Generator
 from llm_processor import get_llm_processor
 from datetime import datetime, timedelta
+import argparse
+import pyperclip  # 添加剪贴板库
 
 # Configure logging
 logging.basicConfig(
@@ -48,6 +50,13 @@ class AskAIRequest(BaseModel):
 
 class AskAIResponse(BaseModel):
     answer: str = Field(..., description="AI's answer to the question.")
+
+class ClipboardRequest(BaseModel):
+    text: str = Field(..., description="The text to copy to the computer's clipboard.")
+
+class ClipboardResponse(BaseModel):
+    success: bool = Field(..., description="Whether the operation was successful.")
+    message: str = Field(..., description="A message describing the result of the operation.")
 
 app = FastAPI()
 
@@ -391,5 +400,36 @@ async def check_correctness(request: CorrectnessRequest):
         logger.error(f"Error checking correctness: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error processing correctness check.")
 
+@app.post(
+    "/api/v1/to_clipboard",
+    response_model=ClipboardResponse,
+    summary="Copy Text to Computer Clipboard",
+    description="Copies the provided text to the computer's clipboard."
+)
+async def copy_to_clipboard(request: ClipboardRequest):
+    try:
+        # 将文本复制到电脑剪贴板
+        pyperclip.copy(request.text)
+        return ClipboardResponse(
+            success=True,
+            message="Text successfully copied to computer clipboard."
+        )
+    except Exception as e:
+        logger.error(f"Error copying to clipboard: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error copying to clipboard: {str(e)}")
+
 if __name__ == '__main__':
-    uvicorn.run(app, host="0.0.0.0", port=3005)
+    parser = argparse.ArgumentParser(description='Run the Brainwave realtime server')
+    parser.add_argument('--ssl-certfile', help='Path to SSL certificate file for HTTPS')
+    parser.add_argument('--port', type=int, default=3005, help='Port to run the server on')
+    parser.add_argument('--host', default="0.0.0.0", help='Host to run the server on')
+    
+    args = parser.parse_args()
+    
+    if args.ssl_certfile:
+        print(f"Running with HTTPS on {args.host}:{args.port}")
+        uvicorn.run(app, host=args.host, port=args.port, ssl_certfile=args.ssl_certfile, ssl_keyfile=args.ssl_certfile)
+    else:
+        print(f"Running with HTTP on {args.host}:{args.port}")
+        print("Note: Microphone access on mobile devices typically requires HTTPS.")
+        uvicorn.run(app, host=args.host, port=args.port)
