@@ -18,6 +18,7 @@ const readabilityButton = document.getElementById('readabilityButton');
 const askAIButton = document.getElementById('askAIButton');
 const correctnessButton = document.getElementById('correctnessButton');
 const toComputerButton = document.getElementById('toComputerButton');
+const toComputerEnhancedButton = document.getElementById('toComputerEnhancedButton');
 
 // Configuration
 const targetSeconds = 5;
@@ -416,6 +417,13 @@ function initializeEventListeners() {
     if (toComputerButton) {
         toComputerButton.addEventListener('click', () => {
             sendToComputerClipboard(transcript.value);
+        });
+    }
+    
+    // 添加增强文本发送到电脑剪贴板按钮的事件监听器
+    if (toComputerEnhancedButton) {
+        toComputerEnhancedButton.addEventListener('click', () => {
+            sendToComputerClipboard(enhancedTranscript.value);
         });
     }
 }
