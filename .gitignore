@@ -3,6 +3,10 @@
 scratchpad.md
 .env
 
+# SSL Certificates
+certs/*.pem
+certs/*.key
+certs/*.crt
 
 # Python
 __pycache__/

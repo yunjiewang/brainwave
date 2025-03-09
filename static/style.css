@@ -48,10 +48,14 @@ h1 {
     animation: pulse 2s infinite;
 }
 
-.transcript-container,
-.enhanced-transcript-container {
+.transcript-container {
     position: relative;
     margin-top: 30px;
+}
+
+.enhanced-transcript-container {
+    position: relative;
+    margin-top: 10px; /* 减少上边距，使其更靠近按钮 */
 }
 
 textarea {
@@ -91,33 +95,27 @@ textarea {
 
 .button-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 20px 0 5px 0;  /* 减少下边距，使按钮更靠近下方文本框 */
+    gap: 10px;
 }
 
 .action-button {
-    flex: 0 1 120px;
-    max-width: 150px;
-    height: 50px;
-    border-radius: 8px;
-    background-color: #007AFF;
-    border: none;
-    cursor: pointer;
+    flex: 1;
+    padding: 12px 15px;
+    background-color: #e67e22;  /* 改为偏深的橙色 */
     color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
     font-size: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    font-weight: 500;
 }
 
 .action-button:hover {
-    background-color: #005bb5;
-    transform: translateY(-2px);
+    background-color: #d35400;  /* 悬停时更深的橙色 */
 }
 
 @keyframes pulse {
@@ -247,9 +245,9 @@ body.dark-theme textarea {
 }
 
 body.dark-theme .action-button {
-    background-color: #34C759;
+    background-color: #e67e22;  /* 暗色主题下也使用相同的橙色 */
 }
 
 body.dark-theme .action-button:hover {
-    background-color: #248a3d;
+    background-color: #d35400;  /* 暗色主题下悬停时的颜色 */
 }

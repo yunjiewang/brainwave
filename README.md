@@ -38,6 +38,35 @@ In the era of rapid information exchange, capturing and organizing ideas swiftly
 
 ---
 
+## Advanced Features
+
+### Cross-Device Clipboard Synchronization
+
+Brainwave includes a powerful feature that allows you to send text from your mobile device directly to your computer's clipboard:
+
+1. **Mobile to Computer Transfer**: When using Brainwave on a mobile device, tap the "To Computer" button to send the transcribed or enhanced text directly to your computer's clipboard.
+
+2. **Instant Availability**: The text becomes immediately available for pasting on your computer, eliminating the need for manual copying or transferring text between devices.
+
+3. **Dual Text Areas**: Both the original transcription and the enhanced text (after applying Readability, Correctness, or Ask AI) can be sent to the computer's clipboard with their respective "To Computer" buttons.
+
+This feature is particularly useful for:
+- Taking voice notes on your phone and immediately using them on your computer
+- Dictating text while away from your desk and having it ready when you return
+- Collaborative environments where multiple people can contribute to a shared document
+
+### HTTPS Support for Mobile Access
+
+To ensure secure connections and enable microphone access on mobile devices:
+
+1. **Self-Signed Certificates**: Generate certificates for local development and testing.
+
+2. **Secure Connections**: Access Brainwave over HTTPS to enable microphone permissions on mobile browsers.
+
+3. **Cross-Device Compatibility**: Use the same application seamlessly across desktop and mobile devices on your local network.
+
+---
+
 ## Deployment
 
 Deploying **Brainwave** involves setting up a Python-based environment, installing the necessary dependencies, and launching the server to handle real-time speech recognition and summarization. Follow the steps below to get started:
@@ -46,6 +75,7 @@ Deploying **Brainwave** involves setting up a Python-based environment, installi
 
 - **Python 3.8+**: Ensure that Python is installed on your system. You can download it from the [official website](https://www.python.org/downloads/).
 - **Virtual Environment Tool**: It's recommended to use `venv` or `virtualenv` to manage project dependencies.
+- **OpenSSL** (Optional): Required for HTTPS support when accessing from mobile devices.
 
 ### Setup Steps
 
@@ -112,14 +142,45 @@ Deploying **Brainwave** involves setting up a Python-based environment, installi
    Start the FastAPI server using Uvicorn:
 
    ```bash
+   # Basic HTTP server
    uvicorn realtime_server:app --host 0.0.0.0 --port 3005
+   
+   # With HTTPS support using uvicorn (recommended for mobile access)
+   uvicorn realtime_server:app --host 0.0.0.0 --port 3005 --ssl-certfile certs/certificate.pem
+   
+   # Or using the Python script with HTTPS support
+   python realtime_server.py --ssl-certfile certs/certificate.pem --port 3005
    ```
 
-   The server will be accessible at `http://localhost:3005`.
+   The server will be accessible at `http://localhost:3005` or `https://localhost:3005` when using HTTPS.
 
 7. **Access the Application**
 
    Open your web browser and navigate to `http://localhost:3005` to interact with Brainwave's speech recognition interface.
+   
+   For mobile device access, use your computer's local IP address (e.g., `https://192.168.1.100:3005`).
+
+### Mobile Device Access
+
+To use Brainwave from mobile devices on the same WiFi network:
+
+1. **Enable HTTPS**: Mobile browsers require HTTPS for microphone access. Generate a self-signed certificate:
+   ```bash
+   # Generate a self-signed certificate
+   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout C:\path\to\certs\certificate.pem -out C:\path\to\certs\certificate.pem -subj "//CN=localhost"
+   ```
+
+2. **Start with HTTPS**: Launch the server with the SSL certificate (either method works):
+   ```bash
+   # Using uvicorn directly
+   uvicorn realtime_server:app --host 0.0.0.0 --port 3005 --ssl-certfile certs/certificate.pem
+   
+   # Or using the Python script
+   python realtime_server.py --ssl-certfile certs/certificate.pem
+   ```
+
+3. **Access from Mobile**: Use your computer's local IP address with HTTPS (e.g., `https://192.168.1.100:3005`).
+   You may need to accept security warnings for self-signed certificates.
 
 ---
 
@@ -159,7 +220,10 @@ Understanding the architecture of **Brainwave** provides insights into its real-
   - **Recording Controls:** A toggle button to start and stop audio recording.
   - **Transcript Display:** A section to display the transcribed and summarized text in real-time.
   - **Copy Functionality:** Enables users to easily copy the summarized text.
+  - **To Computer Button:** Sends the transcribed or enhanced text directly to the computer's clipboard.
+  - **Text Enhancement Options:** Buttons for Readability, Correctness, and Ask AI functions.
   - **Timer:** Visual feedback to indicate recording duration.
+  - **Theme Toggle:** Switch between light and dark themes.
 
 - **Styling:** Utilizes CSS to ensure a modern and user-friendly appearance, optimized for both desktop and mobile devices.
 

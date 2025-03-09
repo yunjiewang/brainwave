@@ -384,7 +384,7 @@ function initializeTheme() {
 document.getElementById('themeToggle').onclick = toggleTheme;
 
 // 添加发送文本到电脑剪贴板的函数
-async function sendToComputerClipboard(text) {
+async function sendToComputerClipboard(text, button) {
     if (!text) return;
     try {
         const response = await fetch('/api/v1/to_clipboard', {
@@ -398,13 +398,13 @@ async function sendToComputerClipboard(text) {
         const result = await response.json();
         
         if (result.success) {
-            showCopiedFeedback(toComputerButton, 'Sent to PC!');
+            showCopiedFeedback(button, 'Sent to PC!');
         } else {
-            showCopiedFeedback(toComputerButton, 'Failed!');
+            showCopiedFeedback(button, 'Failed!');
             console.error('Failed to send to computer clipboard:', result.message);
         }
     } catch (err) {
-        showCopiedFeedback(toComputerButton, 'Error!');
+        showCopiedFeedback(button, 'Error!');
         console.error('Error sending to computer clipboard:', err);
     }
 }
@@ -416,14 +416,14 @@ function initializeEventListeners() {
     // 添加发送到电脑剪贴板按钮的事件监听器
     if (toComputerButton) {
         toComputerButton.addEventListener('click', () => {
-            sendToComputerClipboard(transcript.value);
+            sendToComputerClipboard(transcript.value, toComputerButton);
         });
     }
     
     // 添加增强文本发送到电脑剪贴板按钮的事件监听器
     if (toComputerEnhancedButton) {
         toComputerEnhancedButton.addEventListener('click', () => {
-            sendToComputerClipboard(enhancedTranscript.value);
+            sendToComputerClipboard(enhancedTranscript.value, toComputerEnhancedButton);
         });
     }
 }
