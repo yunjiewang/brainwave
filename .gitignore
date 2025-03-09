@@ -2,7 +2,11 @@
 .windsurfrules
 scratchpad.md
 .env
-logs/*
+
+# Logs
+logs/*.log
+# Keep the logs directory
+!logs/.gitkeep
 
 # SSL Certificates
 certs/*.pem
