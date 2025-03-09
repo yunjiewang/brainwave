@@ -409,8 +409,11 @@ async def check_correctness(request: CorrectnessRequest):
 )
 async def copy_to_clipboard(request: ClipboardRequest):
     try:
+        # 在文本末尾添加两个换行符
+        text_with_line_breaks = request.text + "\n\n"
+        
         # 将文本复制到电脑剪贴板
-        pyperclip.copy(request.text)
+        pyperclip.copy(text_with_line_breaks)
         
         # 如果启用了自动粘贴，则模拟Ctrl+V
         if request.auto_paste:
