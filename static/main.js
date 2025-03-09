@@ -392,13 +392,16 @@ async function sendToComputerClipboard(text, button) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ text }),
+            body: JSON.stringify({ 
+                text,
+                auto_paste: true  // 默认启用自动粘贴
+            }),
         });
         
         const result = await response.json();
         
         if (result.success) {
-            showCopiedFeedback(button, 'Sent to PC!');
+            showCopiedFeedback(button, 'Sent & Pasted!');
         } else {
             showCopiedFeedback(button, 'Failed!');
             console.error('Failed to send to computer clipboard:', result.message);

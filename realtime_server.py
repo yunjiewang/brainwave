@@ -53,6 +53,7 @@ class AskAIResponse(BaseModel):
 
 class ClipboardRequest(BaseModel):
     text: str = Field(..., description="The text to copy to the computer's clipboard.")
+    auto_paste: bool = Field(False, description="Whether to automatically paste the text after copying.")
 
 class ClipboardResponse(BaseModel):
     success: bool = Field(..., description="Whether the operation was successful.")
@@ -410,6 +411,26 @@ async def copy_to_clipboard(request: ClipboardRequest):
     try:
         # 将文本复制到电脑剪贴板
         pyperclip.copy(request.text)
+        
+        # 如果启用了自动粘贴，则模拟Ctrl+V
+        if request.auto_paste:
+            try:
+                import pyautogui
+                # 等待一小段时间，确保剪贴板内容已更新
+                await asyncio.sleep(0.5)
+                # 模拟Ctrl+V粘贴操作
+                pyautogui.hotkey('ctrl', 'v')
+                return ClipboardResponse(
+                    success=True,
+                    message="Text successfully copied to computer clipboard and pasted."
+                )
+            except Exception as paste_error:
+                logger.error(f"Error auto-pasting: {paste_error}", exc_info=True)
+                return ClipboardResponse(
+                    success=True,
+                    message="Text copied to clipboard, but auto-paste failed."
+                )
+        
         return ClipboardResponse(
             success=True,
             message="Text successfully copied to computer clipboard."
