@@ -48,14 +48,19 @@ Brainwave includes a powerful feature that allows you to send text from your mob
 
 1. **Mobile to Computer Transfer**: When using Brainwave on a mobile device, tap the "To Computer" button to send the transcribed or enhanced text directly to your computer's clipboard.
 
-2. **Instant Availability**: The text becomes immediately available for pasting on your computer, eliminating the need for manual copying or transferring text between devices.
+2. **Automatic Pasting**: The text is not only copied to your computer's clipboard but also automatically pasted into the currently active application, eliminating the need for manual Ctrl+V operations.
 
-3. **Dual Text Areas**: Both the original transcription and the enhanced text (after applying Readability, Correctness, or Ask AI) can be sent to the computer's clipboard with their respective "To Computer" buttons.
+3. **Instant Availability**: The text becomes immediately available and inserted at your cursor position, creating a seamless workflow between your mobile device and computer.
+
+4. **Dual Text Areas**: Both the original transcription and the enhanced text (after applying Readability, Correctness, or Ask AI) can be sent to the computer's clipboard with their respective "To Computer" buttons.
 
 This feature is particularly useful for:
 - Taking voice notes on your phone and immediately using them on your computer
 - Dictating text while away from your desk and having it ready when you return
 - Collaborative environments where multiple people can contribute to a shared document
+- Hands-free workflows where you need to minimize keyboard interactions
+
+> **Note**: For automatic pasting to work, ensure your cursor is positioned in the desired application before tapping the "To Computer" button on your mobile device.
 
 ### HTTPS Support for Mobile Access
 
@@ -78,6 +83,7 @@ Deploying **Brainwave** involves setting up a Python-based environment, installi
 - **Python 3.8+**: Ensure that Python is installed on your system. You can download it from the [official website](https://www.python.org/downloads/).
 - **Virtual Environment Tool**: It's recommended to use `venv` or `virtualenv` to manage project dependencies.
 - **OpenSSL** (Optional): Required for HTTPS support when accessing from mobile devices.
+- **GUI Access** (Optional): The automatic pasting feature requires desktop GUI access for simulating keyboard events. This may require additional permissions on some systems.
 
 ### Setup Steps
 

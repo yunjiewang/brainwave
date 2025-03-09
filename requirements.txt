@@ -12,3 +12,4 @@ pytest-mock
 httpx
 python-dotenv
 pyperclip
+pyautogui
