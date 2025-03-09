@@ -48,19 +48,40 @@ Brainwave includes a powerful feature that allows you to send text from your mob
 
 1. **Mobile to Computer Transfer**: When using Brainwave on a mobile device, tap the "To Computer" button to send the transcribed or enhanced text directly to your computer's clipboard.
 
-2. **Automatic Pasting**: The text is not only copied to your computer's clipboard but also automatically pasted into the currently active application, eliminating the need for manual Ctrl+V operations.
+2. **Instant Availability**: The text becomes immediately available for pasting on your computer, eliminating the need for manual copying or transferring text between devices.
 
-3. **Instant Availability**: The text becomes immediately available and inserted at your cursor position, creating a seamless workflow between your mobile device and computer.
-
-4. **Dual Text Areas**: Both the original transcription and the enhanced text (after applying Readability, Correctness, or Ask AI) can be sent to the computer's clipboard with their respective "To Computer" buttons.
+3. **Dual Text Areas**: Both the original transcription and the enhanced text (after applying Readability, Correctness, or Ask AI) can be sent to the computer's clipboard with their respective "To Computer" buttons.
 
 This feature is particularly useful for:
 - Taking voice notes on your phone and immediately using them on your computer
 - Dictating text while away from your desk and having it ready when you return
 - Collaborative environments where multiple people can contribute to a shared document
-- Hands-free workflows where you need to minimize keyboard interactions
 
-> **Note**: For automatic pasting to work, ensure your cursor is positioned in the desired application before tapping the "To Computer" button on your mobile device.
+### Automatic Logging System
+
+Brainwave now includes a comprehensive logging system that automatically records all transcriptions and AI-enhanced content:
+
+1. **Daily Log Files**: All content is logged in date-based files (YYYY-MM-DD.log) in the `logs` directory, making it easy to track and review your work by date.
+
+2. **Comprehensive Content Tracking**: The logging system captures:
+   - **Transcriptions**: All speech-to-text conversions
+   - **Readability Enhancements**: Results from the Readability feature
+   - **Correctness Checks**: Results from the Correctness feature
+   - **AI Responses**: Answers from the Ask AI feature
+
+3. **Structured Format**: Each log entry includes:
+   - Timestamp (YYYY-MM-DD HH:MM:SS)
+   - Content type identifier
+   - The complete content
+   - Clear separators between entries
+
+4. **Automatic Organization**: The system automatically creates the logs directory and manages file creation, requiring no user intervention.
+
+This logging feature provides several benefits:
+- Maintains a permanent record of all your transcriptions and AI interactions
+- Allows for easy reference to previous work
+- Provides backup in case of browser or application issues
+- Enables analysis of usage patterns and content over time
 
 ### HTTPS Support for Mobile Access
 
@@ -212,6 +233,8 @@ Understanding the architecture of **Brainwave** provides insights into its real-
 brainwave/
 ├── certs/                  # Directory for SSL certificates
 │   └── .gitkeep            # Placeholder to ensure directory is tracked in Git
+├── logs/                   # Directory for automatic logging
+│   └── YYYY-MM-DD.log      # Daily log files with timestamps
 ├── static/                 # Frontend assets
 │   ├── realtime.html       # Main HTML interface
 │   ├── style.css           # CSS styles
@@ -238,6 +261,10 @@ brainwave/
   - **Buffer Management:** Accumulates audio chunks for efficient processing and transmission.
 - **Concurrency:** Employs `asyncio` to manage asynchronous tasks for receiving and sending audio data, ensuring non-blocking operations.
 - **Logging:** Implements comprehensive logging to monitor connections, data flow, and potential errors.
+- **Content Logging System:**
+  - **`log_content` Function:** Records all transcriptions and AI-processed content to daily log files.
+  - **Automatic Organization:** Creates and manages log files based on the current date.
+  - **Structured Format:** Includes timestamps, content types, and clear separators for easy reading.
 
 #### b. `openai_realtime_client.py`
 

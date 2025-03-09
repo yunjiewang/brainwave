@@ -72,6 +72,39 @@ llm_processor = get_llm_processor("gpt-4o")  # Default processor
 # Use an absolute path for the static directory
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
+def log_content(content_type, content):
+    """
+    记录内容到日志文件
+    
+    Args:
+        content_type: 内容类型 ("Transcript", "Readability", "Correctness", "AskAI")
+        content: 要记录的内容
+    """
+    # 获取当前日期作为文件名
+    today = datetime.now().strftime("%Y-%m-%d")
+    
+    # 使用绝对路径，确保日志文件被创建在正确的位置
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    log_dir = os.path.join(base_dir, "logs")
+    log_file = os.path.join(log_dir, f"{today}.log")
+    
+    # 确保日志目录存在
+    os.makedirs(log_dir, exist_ok=True)
+    
+    # 格式化当前时间和内容
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    formatted_content = f"""
+=== {content_type} - {timestamp} ===
+{content}
+==============================================
+"""
+    
+    # 写入日志文件
+    with open(log_file, "a", encoding="utf-8") as f:
+        f.write(formatted_content)
+    
+    logger.info(f"Logged {content_type} content to {log_file}")
+
 @app.get("/", response_class=HTMLResponse)
 async def get_realtime_page(request: Request):
     return FileResponse(os.path.join(os.path.dirname(__file__), "static/realtime.html"))
@@ -126,6 +159,9 @@ async def websocket_endpoint(websocket: WebSocket):
     openai_ready = asyncio.Event()
     pending_audio_chunks = []
     
+    # 添加变量跟踪完整的听译内容
+    full_transcript = ""
+    
     async def initialize_openai():
         nonlocal client
         try:
@@ -169,11 +205,14 @@ async def websocket_endpoint(websocket: WebSocket):
 
     # Move the handler definitions here (before initialize_openai)
     async def handle_text_delta(data):
+        nonlocal full_transcript
         try:
             if websocket.client_state == WebSocketState.CONNECTED:
+                delta = data.get("delta", "")
+                full_transcript += delta  # 累积完整的听译内容
                 await websocket.send_text(json.dumps({
                     "type": "text",
-                    "content": data.get("delta", ""),
+                    "content": delta,
                     "isNewResponse": False
                 }))
                 logger.info("Handled response.text.delta")
@@ -181,6 +220,8 @@ async def websocket_endpoint(websocket: WebSocket):
             logger.error(f"Error in handle_text_delta: {str(e)}", exc_info=True)
 
     async def handle_response_created(data):
+        nonlocal full_transcript
+        full_transcript = ""  # 重置完整的听译内容
         await websocket.send_text(json.dumps({
             "type": "text",
             "content": "",
@@ -198,9 +239,13 @@ async def websocket_endpoint(websocket: WebSocket):
         logger.info("Handled error message from OpenAI")
 
     async def handle_response_done(data):
-        nonlocal client
+        nonlocal client, full_transcript
         logger.info("Handled response.done")
         recording_stopped.set()
+        
+        # 记录完整的听译内容到日志
+        if full_transcript:
+            log_content("Transcript", full_transcript)
         
         if client:
             try:
@@ -348,10 +393,18 @@ async def enhance_readability(request: ReadabilityRequest):
         raise HTTPException(status_code=500, detail="Readability prompt not found.")
 
     try:
+        # 用于收集完整的增强文本
+        full_enhanced_text = ""
+        
         async def text_generator():
+            nonlocal full_enhanced_text
             # Use gpt-4o specifically for readability
             async for part in llm_processor.process_text(request.text, prompt, model="gpt-4o"):
+                full_enhanced_text += part
                 yield part
+            
+            # 在生成完整内容后记录到日志
+            log_content("Readability", full_enhanced_text)
 
         return StreamingResponse(text_generator(), media_type="text/plain")
 
@@ -373,6 +426,10 @@ def ask_ai(request: AskAIRequest):
     try:
         # Use o1-mini specifically for ask_ai
         answer = llm_processor.process_text_sync(request.text, prompt, model="o1-mini")
+        
+        # 记录AI回答到日志
+        log_content("AskAI", answer)
+        
         return AskAIResponse(answer=answer)
     except Exception as e:
         logger.error(f"Error processing AI question: {e}", exc_info=True)
@@ -390,10 +447,18 @@ async def check_correctness(request: CorrectnessRequest):
         raise HTTPException(status_code=500, detail="Correctness prompt not found.")
 
     try:
+        # 用于收集完整的正确性检查结果
+        full_correctness_result = ""
+        
         async def text_generator():
+            nonlocal full_correctness_result
             # Specifically use gpt-4o for correctness checking
             async for part in llm_processor.process_text(request.text, prompt, model="gpt-4o"):
+                full_correctness_result += part
                 yield part
+            
+            # 在生成完整内容后记录到日志
+            log_content("Correctness", full_correctness_result)
 
         return StreamingResponse(text_generator(), media_type="text/plain")
 
@@ -449,6 +514,12 @@ if __name__ == '__main__':
     parser.add_argument('--host', default="0.0.0.0", help='Host to run the server on')
     
     args = parser.parse_args()
+    
+    # 确保logs目录存在（使用绝对路径）
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    log_dir = os.path.join(base_dir, "logs")
+    os.makedirs(log_dir, exist_ok=True)
+    logger.info(f"Ensured logs directory exists at {log_dir}")
     
     if args.ssl_certfile:
         print(f"Running with HTTPS on {args.host}:{args.port}")

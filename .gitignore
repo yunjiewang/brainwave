@@ -2,6 +2,7 @@
 .windsurfrules
 scratchpad.md
 .env
+logs/*
 
 # SSL Certificates
 certs/*.pem
