@@ -3,9 +3,11 @@
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Deployment](#deployment)
-3. [Code Structure & Architecture](#code-structure--architecture)
-4. [Testing](#testing)
+2. [Advanced Features](#advanced-features)
+3. [Deployment](#deployment)
+4. [Code Structure & Architecture](#code-structure--architecture)
+5. [Testing](#testing)
+6. [Conclusion](#conclusion)
 
 ---
 
@@ -117,7 +119,17 @@ Deploying **Brainwave** involves setting up a Python-based environment, installi
 
 5. **Configure Environment Variables**
 
-   Brainwave requires the OpenAI API key to function. Set the `OPENAI_API_KEY` environment variable:
+   Brainwave requires the OpenAI API key to function. You can set up the environment variables using the provided example:
+
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env
+   
+   # Edit the .env file with your API keys
+   # Replace 'your-openai-api-key' with your actual OpenAI API key
+   ```
+
+   Alternatively, you can set the `OPENAI_API_KEY` environment variable directly:
 
    - **On macOS/Linux:**
 
@@ -187,6 +199,27 @@ To use Brainwave from mobile devices on the same WiFi network:
 ## Code Structure & Architecture
 
 Understanding the architecture of **Brainwave** provides insights into its real-time processing capabilities and multilingual support. The project is organized into several key components, each responsible for distinct functionalities.
+
+### Project Structure
+
+```
+brainwave/
+├── certs/                  # Directory for SSL certificates
+│   └── .gitkeep            # Placeholder to ensure directory is tracked in Git
+├── static/                 # Frontend assets
+│   ├── realtime.html       # Main HTML interface
+│   ├── style.css           # CSS styles
+│   └── main.js             # Frontend JavaScript
+├── tests/                  # Test suite
+├── .env.example            # Example environment variables
+├── .gitignore              # Git ignore rules
+├── llm_processor.py        # LLM integration for text processing
+├── openai_realtime_client.py # OpenAI API client
+├── prompts.py              # Prompt templates
+├── README.md               # Project documentation
+├── realtime_server.py      # Main server application
+└── requirements.txt        # Python dependencies
+```
 
 ### 1. **Backend**
 
